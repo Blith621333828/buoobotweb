@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="buoobot.png" type="image/png">
+    <title>Polski bot Discord | BuooBot</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #1a2a6c, #b21f1f, #fdbb2d);
+            overflow-x: hidden;
+            color: #fff;
+            position: relative;
+        }
+
+        /* Animowane kółka w tle */
+        .plama {
+            position: absolute;
+            background: rgba(255, 215, 0, 0.6); /* Złoty kolor */
+            border-radius: 50%;
+            filter: blur(3px);
+            mix-blend-mode: screen;
+            opacity: 0.8;
+            will-change: transform, opacity;
+            animation: moveAndTransform 20s infinite, pulse 2s infinite;
+        }
+
+        @keyframes moveAndTransform {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                transform: translate(calc(100vw * var(--random-x) - 50px), calc(100vh * var(--random-y) - 50px)) scale(1.5);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Styl dla paska na górze */
+        .blur-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            transition: top 0.3s ease-in-out;
+        }
+
+        .button,
+        .premium-button {
+            background-color: rgba(0, 123, 255, 0.1);
+            border: 2px solid rgba(0, 123, 255, 0.3);
+            color: #007bff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-right: 15px;
+            text-decoration: none;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: scale(1.1);
+        }
+
+        .premium-button {
+            margin-left: auto;
+            background-color: rgba(236, 227, 89, 0.1);
+            color: #ece359;
+            border-color: rgba(236, 227, 89, 0.3);
+        }
+
+        .premium-button:hover {
+            cursor: not-allowed;
+        }
+
+        .divider {
+            width: 1px;
+            height: 40px;
+            background-color: gray;
+            margin-right: 15px;
+        }
+
+        /* Główna sekcja z tekstem i logo */
+        .main-content {
+            display: flex;
+            align-items: center;
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .main-content img {
+            margin-right: 20px;
+            width: 150px;
+            height: auto;
+        }
+
+        .main-text {
+            max-width: calc(100% - 200px); /* Odejmuje miejsce na logo */
+        }
+
+        .main-text h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .main-text h1 span {
+            color: gold; /* Złoty kolor */
+        }
+
+        .main-text h2 {
+            font-size: 24px;
+            color: white;
+        }
+
+        .main-text h2 a {
+            color: #0066cc;
+            text-decoration: none;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .main-text h2 a:hover {
+            transform: scale(1.1);
+        }
+
+        .main-text p {
+            font-size: 18px;
+        }
+
+        /* Styl dla sekcji na dole strony */
+        .section {
+            display: flex;
+            align-items: center;
+            padding: 50px 20px;
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+        }
+
+        .section img {
+            width: 300px;
+            margin: 0;
+        }
+
+        .section-text {
+            max-width: 500px;
+        }
+
+        .section-text h3 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .section-left {
+            margin-left: 0;
+            justify-content: flex-start;
+        }
+
+        .section-left .section-text {
+            margin-left: 20px;
+            text-align: left;
+        }
+
+        .section-left img {
+            margin-left: 0;
+        }
+
+        /* Karuzela */
+        .carousel {
+            position: relative;
+            width: 80%;
+            max-width: 900px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 33.333%;
+            box-sizing: border-box;
+            padding: 0 10px;
+            position: relative;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .carousel-slide.center img {
+            transform: scale(1.1);
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            font-size: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .carousel-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .carousel-button.left {
+            left: 10px;
+        }
+
+        .carousel-button.right {
+            right: 10px;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .carousel-slide:hover .tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animowane kółka w tle -->
+    <script>
+        const colors = [
+            'rgba(255, 215, 0, 0.6)', // Złoty kolor
+            'rgba(255, 223, 0, 0.6)', // Jaśniejszy złoty
+            'rgba(255, 235, 59, 0.6)', // Jasny żółty
+        ];
+
+        function createPlama() {
+            const plama = document.createElement('div');
+            plama.className = 'plama';
+            const size = Math.random() * 100 + 50;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const duration = Math.random() * 20 + 10; // Duration between 10s and 30s
+
+            const randomX = Math.random();
+            const randomY = Math.random();
+
+            plama.style.width = `${size}px`;
+            plama.style.height = `${size}px`;
+            plama.style.background = color;
+            plama.style.animation = `moveAndTransform ${duration}s infinite, pulse ${duration * 0.5}s infinite`;
+            plama.style.top = `${Math.random() * 100}vh`;
+            plama.style.left = `${Math.random() * 100}vw`;
+
+            // Add CSS variables to control animation
+            plama.style.setProperty('--random-x', randomX);
+            plama.style.setProperty('--random-y', randomY);
+
+            document.body.appendChild(plama);
+        }
+
+        // Create a number of plamy
+        for (let i = 0; i < 20; i++) {
+            createPlama();
+        }
+    </script>
+
+    <!-- Górny pasek z przyciskami -->
+    <div class="blur-bar" id="blur-bar">
+        <a href="https://discord.gg/9dzkYcnhMB" class="button">Serwer wsparcia</a>
+        <div class="divider"></div>
+        <a href="https://discord.com/oauth2/authorize?client_id=1192387148234629180" class="button">Dodaj Bota</a>
+        <a href="#" class="premium-button" onclick="return false;">Premium</a>
+    </div>
+
+    <!-- Główna treść strony -->
+    <div class="main-content">
+        <a href="https://www.buoobot.ovh/">
+            <img src="buoobot.png" alt="BuooBot Logo">
+        </a>
+        <div class="main-text">
+            <h1>Taki bot to <span>złoto</span></h1>
+            <h2>
+                <a href="https://discord.com/oauth2/authorize?client_id=1192387148234629180">BuooBot</a> -
+                Nowy i Polski innowacyjny Bot Discord!
+            </h2>
+            <p>Zawiera sporo przydatnych i zabawnych komend, które ułatwią i umilą ci moderowanie oraz korzystanie z serwera!</p>
+        </div>
+    </div>
+
+    <!-- Sekcja Giveaway -->
+    <div class="section section-left">
+        <img src="zdj1.png" alt="Giveaway Image">
+        <div class="section-text">
+            <h3>Giveaway</h3>
+            <p>Teraz nie musisz dodawać bota giveaway do swojego serwera, ma to BuooBot! Komendy: /gstart, /gend, /gedit, /greroll.</p>
+        </div>
+    </div>
+
+    <!-- Sekcja Ustawienia -->
+    <div class="section section-left">
+        <img src="zdj2.png" alt="Ustawienia Image">
+        <div class="section-text">
+            <h3>Ustawienia</h3>
+            <p>Teraz ustawienie funkcji w botcie to prosta sprawa! Gdy konfigurujesz funkcje, bot proponuje ci film, jak to zrobić! Funkcje: Logi, Powitania, Żegnania, i Administracyjne (Zmiana Prefixu, Antylink).</p>
+        </div>
+    </div>
+
+    <!-- Sekcja 4Fun -->
+    <div class="section section-left">
+        <img src="zdj3.png" alt="4Fun Image">
+        <div class="section-text">
+            <h3>4Fun</h3>
+            <p>BuooBot posiada w swojej ofercie Komendy 4Fun! Funkcje: 8ball, Hack, i wiele więcej!</p>
+        </div>
+    </div>
+
+    <!-- Sekcja Zespół -->
+    <div class="section section-left">
+        <img src="zespol.png" alt="Zespół Image">
+        <div class="section-text">
+            <h3>Zespół</h3>
+            <p>Poznaj zespół BuooBot! Oto osoby, które pracują nad botem:</p>
+            <ul>
+                <li><strong>Vandusiek</strong>: Pomocnik</li>
+                <li><strong>Frugo</strong>: Właściciel</li>
+                <li><strong>Blith</strong>: Główny grafik, Główny pomocnik, Autor strony</li>
+                <li><strong>destrukcja_team</strong>: Pomocnik</li>
+                <li><strong>Chapa</strong>: Pomocnik</li>
+                <li><strong>Wielki lord</strong>: Pomocnik</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Karuzela -->
+    <div class="carousel">
+        <div class="carousel-track">
+            <div class="carousel-slide center">
+                <img src="1.png" alt="Image 1">
+                <div class="tooltip">Vandusiek: Pomocnik</div>
+            </div>
+            <div class="carousel-slide">
+                <img src="2.png" alt="Image 2">
+                <div class="tooltip">Frugo: Właściciel</div>
+            </div>
+            <div class="carousel-slide">
+                <img src="3.png" alt="Image 3">
+                <div class="tooltip">Blith: Główny grafik, Główny pomocnik, Autor strony</div>
+            </div>
+            <div class="carousel-slide">
+                <img src="4.png" alt="Image 4">
+                <div class="tooltip">destrukcja_team: Pomocnik</div>
+            </div>
+            <div class="carousel-slide">
+                <img src="5.png" alt="Image 5">
+                <div class="tooltip">Chapa: Pomocnik</div>
+            </div>
+            <div class="carousel-slide">
+                <img src="6.png" alt="Image 6">
+                <div class="tooltip">Wielki lord: Pomocnik</div>
+            </div>
+        </div>
+        <button class="carousel-button left" onclick="moveCarousel(-1)">&#9664;</button>
+        <button class="carousel-button right" onclick="moveCarousel(1)">&#9654;</button>
+    </div>
+
+    <script>
+        // JavaScript for moving the carousel
+        let index = 0;
+
+        function moveCarousel(direction) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const totalSlides = slides.length;
+            const slideWidth = slides[0].offsetWidth;
+
+            index = (index + direction + totalSlides) % totalSlides;
+            const offset = -index * slideWidth;
+            document.querySelector('.carousel-track').style.transform = `translateX(${offset}px)`;
+            
+            // Update the center class
+            slides.forEach(slide => slide.classList.remove('center'));
+            slides[index + 1].classList.add('center');
+        }
+
+        // Initialize carousel
+        moveCarousel(0);
+    </script>
+
+    <script>
+        let lastScrollTop = 0;
+        const blurBar = document.getElementById('blur-bar');
+
+        window.addEventListener('scroll', function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (scrollTop > lastScrollTop) {
+                blurBar.style.top = '-100px';
+            } else {
+                blurBar.style.top = '0';
+            }
+            lastScrollTop = scrollTop;
+        });
+    </script>
+</body>
+
+</html>
